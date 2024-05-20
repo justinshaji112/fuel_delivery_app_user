@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "354628486908",
+    "project_id": "fueldelivaryapp",
+    "storage_bucket": "fueldelivaryapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354628486908:android:89c6b9f7a770b994a43979",
+        "android_client_info": {
+          "package_name": "com.example.fuel_delivery_app_service_provider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354628486908-66bt4ec4jgep3pmcl6cg3ude5up64qgh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fuel_delivery_app_service_provider",
+            "certificate_hash": "4d6c3694d1769da337071773ebf9f960c9e56f94"
+          }
+        },
+        {
+          "client_id": "354628486908-fp7rioo4bj74ern2ed31kb9fs2v91clg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9n0Vh2xnvnAr7S6DjiM3w-dWrNtSJzQ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354628486908-fp7rioo4bj74ern2ed31kb9fs2v91clg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "354628486908-1qhg79r8ln244fidb6fksueg7tqgc1ek.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fuelDeliveryAppUser"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354628486908:android:646060507c22a851a43979",
+        "android_client_info": {
+          "package_name": "com.example.fuel_delivery_app_user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354628486908-m5t0de2aivv7ms4tugqejmmhao7m3ib9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fuel_delivery_app_user",
+            "certificate_hash": "4d6c3694d1769da337071773ebf9f960c9e56f94"
+          }
+        },
+        {
+          "client_id": "354628486908-fp7rioo4bj74ern2ed31kb9fs2v91clg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9n0Vh2xnvnAr7S6DjiM3w-dWrNtSJzQ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354628486908-fp7rioo4bj74ern2ed31kb9fs2v91clg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "354628486908-1qhg79r8ln244fidb6fksueg7tqgc1ek.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fuelDeliveryAppUser"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

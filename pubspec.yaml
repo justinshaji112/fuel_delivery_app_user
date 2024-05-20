@@ -1,0 +1,59 @@
+name: fuel_delivery_app_user
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+
+dependencies:
+  cloud_firestore: ^4.17.2
+  either_dart: ^1.0.0
+  equatable: ^2.0.5
+  firebase_auth: ^4.19.4
+  firebase_auth_rest: ^2.0.4
+  firebase_core: ^2.30.1
+  flutter:
+    sdk: flutter
+  flutter_screenutil: ^5.9.0
+  gap: ^3.0.1
+  hexcolor: ^3.0.1
+  intl_phone_field: ^3.2.0
+  lottie: ^3.1.0  
+  otp_text_field_v2: ^1.0.3
+  google_login: ^1.0.3
+  bloc_connectivity: ^0.0.2
+  dartz: ^0.10.1
+  flutter_bloc: ^8.1.5
+  get_it: ^7.7.0
+  google_sign_in: ^6.2.1
+  google_nav_bar: ^5.0.6
+  font_awesome_flutter: ^10.7.0
+  google_fonts: ^6.2.1
+  go_router: ^14.1.1
+  flutter_localization: ^0.2.0
+  intl: ^0.18.1
+
+
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: fonts/Inter-Black.ttf
+    - family: Inter-var
+      fonts:
+        - asset: fonts/Inter-VariableFont_slnt,wght.ttf
+  assets:
+      - assets/animations/
+      - assets/images/
+
+         
