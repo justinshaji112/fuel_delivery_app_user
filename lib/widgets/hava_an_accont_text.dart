@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuel_delivery_app_user/app/constants/colors.dart';
 
-class SingUpOrLoginText extends StatelessWidget {
- final String prefixText;
- final String buttonText;
- final void Function() onTap;
-  SingUpOrLoginText(
+class SignUpOrLoginText extends StatelessWidget {
+  final String prefixText;
+  final String buttonText;
+  final void Function() onTap;
+  SignUpOrLoginText(
       {super.key,
       required this.onTap,
       required this.buttonText,

@@ -7,14 +7,14 @@ import 'package:fuel_delivery_app_user/app/constants/colors.dart';
 import 'package:fuel_delivery_app_user/app/constants/size.dart';
 
 // ignore: must_be_immutable
-class PassWordFeeld extends StatefulWidget {
+class PasswordField extends StatefulWidget {
   final String lableText;
   final String hintText;
   FocusNode focusNode;
 
   final String? Function(String?)? validator;
   final TextEditingController controller;
-  PassWordFeeld({
+  PasswordField({
     required this.focusNode,
     required this.hintText,
     required this.lableText,
@@ -23,10 +23,10 @@ class PassWordFeeld extends StatefulWidget {
   });
 
   @override
-  State<PassWordFeeld> createState() => _PassWordFeeldState();
+  State<PasswordField> createState() => _PasswordFieldState();
 }
 
-class _PassWordFeeldState extends State<PassWordFeeld> {
+class _PasswordFieldState extends State<PasswordField> {
   bool _isPasswordVisible = false;
 
   // Assuming AppSize is defined elsewhere

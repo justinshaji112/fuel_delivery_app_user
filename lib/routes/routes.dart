@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fuel_delivery_app_user/features/auth/presentation/pages/login_page.dart';
-import 'package:fuel_delivery_app_user/features/auth/presentation/pages/on_bording.dart';
-import 'package:fuel_delivery_app_user/features/auth/presentation/pages/signup.dart';
-import 'package:fuel_delivery_app_user/features/auth/presentation/pages/validate_email.dart';
-import 'package:fuel_delivery_app_user/features/home/presentation/screen_home.dart';
+import 'package:fuel_delivery_app_user/core/auth/presentation/pages/login_page.dart';
+import 'package:fuel_delivery_app_user/core/auth/presentation/pages/on_bording.dart';
+import 'package:fuel_delivery_app_user/core/auth/presentation/pages/signup.dart';
+import 'package:fuel_delivery_app_user/core/auth/presentation/pages/validate_email.dart';
+import 'package:fuel_delivery_app_user/core/home/presentation/screen_home.dart';
 import 'package:fuel_delivery_app_user/login_manger.dart';
 import 'package:fuel_delivery_app_user/routes/route_names.dart';
 import 'package:go_router/go_router.dart';

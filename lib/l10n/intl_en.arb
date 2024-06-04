@@ -1,0 +1,18 @@
+{
+    "login":"Login",
+    "sing_up": "Sing Up",
+    "email":"Email",
+    "password":"Password",
+    "email_hint":"Enter your Email",
+    "password_hint":"Enter your password",
+    "alrady_have_account":"Alrady have an Acoount",
+    "dont_have_an_account":"Dont have an Account",
+    "sign_up_with_google":"Sing up with google",
+    "name":"Name",
+    "name_hint":"Enter your name"
+    
+
+
+
+    
+}

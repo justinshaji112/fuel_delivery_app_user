@@ -1,8 +1,8 @@
-import 'package:fuel_delivery_app_user/features/auth/data/datasources/auth_datasorce.dart';
+import 'package:fuel_delivery_app_user/core/auth/data/datasources/auth_datasorce.dart';
 import 'package:get_it/get_it.dart';
-import 'features/auth/data/repositories/auth_repository.dart';
-import 'features/auth/domain/repositories/auth_rempsitory.dart';
-import 'features/auth/domain/usecases/auth_usecase.dart';
+import 'core/auth/data/repositories/auth_repository.dart';
+import 'core/auth/domain/repositories/auth_rempsitory.dart';
+import 'core/auth/domain/usecases/auth_usecase.dart';
 
 final locator = GetIt.instance;
 

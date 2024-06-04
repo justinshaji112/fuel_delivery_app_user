@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fuel_delivery_app_user/widgets/decorations/input_deconrations.dart';
 import 'package:fuel_delivery_app_user/app/constants/colors.dart';
-import 'package:fuel_delivery_app_user/core/validators/text_validators.dart';
+import 'package:fuel_delivery_app_user/core/auth/presentation/validators/text_validators.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 class PhoneNumberFeild extends StatelessWidget {

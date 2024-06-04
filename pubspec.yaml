@@ -55,5 +55,6 @@ flutter:
   assets:
       - assets/animations/
       - assets/images/
+  generate: true
 
          
