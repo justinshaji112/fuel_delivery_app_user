@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
-import '../../auth/domain/repositories/auth_rempsitory.dart';
-
+import 'package:fuel_delivery_app_user/core/domain/repositories/auth_rempsitory.dart';
 
 abstract class CheckSignInnUsecase {
   @override
@@ -14,7 +12,7 @@ class CheckSignInUsecaseImpl extends CheckSignInnUsecase {
 
   @override
   @override
-  Future<User?> exicute() {
-    return authRepository.isLogedIn();
+  Future<User?> exicute()  async{
+    return await authRepository.isLogedIn();
   }
 }

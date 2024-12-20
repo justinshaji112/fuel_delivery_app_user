@@ -1,6 +1,4 @@
-
-
-import '../../auth/domain/repositories/auth_rempsitory.dart';
+import 'package:fuel_delivery_app_user/core/domain/repositories/auth_rempsitory.dart';
 
 abstract class SendVerificationEmaileUsecase {
   @override
