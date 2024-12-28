@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:fuel_delivery_app_user/config/firebase_cofigarations.dart';
+import 'package:fuel_delivery_app_user/core/presentation/models/address_model.dart';
 import 'package:fuel_delivery_app_user/core/presentation/models/services_model.dart';
+import 'package:fuel_delivery_app_user/core/presentation/models/vehicle_model.dart';
 import 'package:fuel_delivery_app_user/core/presentation/pages/home/methods/razor_pay.dart';
+import 'package:fuel_delivery_app_user/core/services/profile_date_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class ServiceBookingPage extends StatefulWidget {
   final Service service;
@@ -13,24 +18,7 @@ class ServiceBookingPage extends StatefulWidget {
 }
 
 class _ServiceBookingPageState extends State<ServiceBookingPage> {
-  // Selected Vehicle Details (Mock data - replace with actual data)
-  final Map<String, dynamic> _selectedVehicle = {
-    'make': 'Tesla',
-    'model': 'Model 3',
-    'year': '2022',
-    'batteryCapacity': '75 kWh',
-    'chargerType': 'Type 2'
-  };
-
-  // Selected Address Details (Mock data - replace with actual data)
-  final Map<String, dynamic> _selectedAddress = {
-    'street': '123 Electric Avenue',
-    'city': 'Tech City',
-    'state': 'CA',
-    'postalCode': '94000'
-  };
-
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   String? _selectedTimeSlot;
   SubService? _selectedService;
 
@@ -63,67 +51,99 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Vehicle Details Section
-              _buildSectionHeader('Selected Vehicle'),
-              _buildVehicleDetails(),
+      body: StreamBuilder<ProfileModel>(
+        stream: ProfileDateService().getProfileStream(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-              const SizedBox(height: 20),
+          final profile = snapshot.data!;
+          final selectedAddress = profile.address.isNotEmpty &&
+                  snapshot.data!.profileData["selectedAddress"].isNotEmpty
+              ? profile.address[
+                  int.parse(snapshot.data!.profileData["selectedAddress"])]
+              : profile.address.isNotEmpty &&
+                      snapshot.data!.profileData["selectedAddress"].isEmpty
+                  ? profile.address.first
+                  : null;
+          final selectedVehicle = profile.vehicles.isNotEmpty &&
+                  snapshot.data!.profileData["selectedVehicle"].isNotEmpty
+              ? profile.vehicles[
+                  int.parse(snapshot.data!.profileData["selectedVehicle"])]
+              : profile.vehicles.isNotEmpty &&
+                      snapshot.data!.profileData["selectedVehicle"].isEmpty
+                  ? profile.vehicles.first
+                  : null;
 
-              // Address Details Section
-              _buildSectionHeader(' Location'),
-              _buildAddressDetails(),
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Vehicle Details Section
+                  _buildSectionHeader('Selected Vehicle'),
+                  selectedVehicle != null
+                      ? _buildVehicleDetails(selectedVehicle)
+                      : const Center(child: Text("No vehicle selected")),
 
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              // Service Options Section
-              _buildSectionHeader('Services'),
-              _buildServiceOptions(widget.service),
+                  // Address Details Section
+                  _buildSectionHeader(' Location'),
+                  selectedAddress != null
+                      ? _buildAddressDetails(selectedAddress)
+                      : const Center(child: Text("No address selected")),
 
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              // Date Selection
-              _buildSectionHeader('Select Date'),
-              _buildDatePicker(),
+                  // Service Options Section
+                  _buildSectionHeader('Services'),
+                  _buildServiceOptions(widget.service),
 
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              // Time Slot Selection
-              _buildSectionHeader('Select Time Slot'),
-              _buildTimeSlotSelection(),
+                  // Date Selection
+                  _buildSectionHeader('Select Date'),
+                  _buildDatePicker(),
 
-              const SizedBox(height: 30),
+                  const SizedBox(height: 20),
 
-              // Book Now Button
-              Center(
-                child: ElevatedButton(
-                  onPressed: _validateAndBook,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                  // Time Slot Selection
+                  _buildSectionHeader('Select Time Slot'),
+                  _buildTimeSlotSelection(),
+
+                  const SizedBox(height: 30),
+
+                  // Book Now Button
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () => _validateAndBook(
+                          selectedVehicle != null && selectedAddress != null),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        'Book Now',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                  child: Text(
-                    'Book Now',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -144,7 +164,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
   }
 
   // Vehicle Details Widget
-  Widget _buildVehicleDetails() {
+  Widget _buildVehicleDetails(VehicleModel vehicle) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -161,19 +181,20 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildDetailRow('Make', _selectedVehicle['make']),
-          _buildDetailRow('Model', _selectedVehicle['model']),
-          _buildDetailRow('Year', _selectedVehicle['year']),
-          _buildDetailRow(
-              'Battery Capacity', _selectedVehicle['batteryCapacity']),
-          _buildDetailRow('Charger Type', _selectedVehicle['chargerType']),
+          _buildDetailRow('Make', vehicle.make),
+          _buildDetailRow('Model', vehicle.model),
+          _buildDetailRow('Year', vehicle.year),
+          if (vehicle.isElectric) ...[
+            _buildDetailRow('Battery Capacity', vehicle.batteryCapacity ?? ''),
+            _buildDetailRow('Charger Type', vehicle.chargerType ?? ''),
+          ],
         ],
       ),
     );
   }
 
   // Address Details Widget
-  Widget _buildAddressDetails() {
+  Widget _buildAddressDetails(AddressModel address) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -190,10 +211,10 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildDetailRow('Street', _selectedAddress['street']),
-          _buildDetailRow('City', _selectedAddress['city']),
-          _buildDetailRow('State', _selectedAddress['state']),
-          _buildDetailRow('Postal Code', _selectedAddress['postalCode']),
+          _buildDetailRow('Street', address.streetAddress),
+          _buildDetailRow('City', address.city),
+          _buildDetailRow('State', address.state),
+          _buildDetailRow('Postal Code', address.postalCode),
         ],
       ),
     );
@@ -236,8 +257,9 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
-              color:
-                  _selectedService == subService ? Colors.black12 : Colors.white,
+              color: _selectedService == subService
+                  ? Colors.black12
+                  : Colors.white,
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
                   color: _selectedService == subService
@@ -284,7 +306,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '${subService.price.toStringAsFixed(2)}',
+                      subService.price.toStringAsFixed(2),
                       style: GoogleFonts.montserrat(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
@@ -426,7 +448,12 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
   }
 
   // Validation and Booking Method
-  void _validateAndBook() {
+  void _validateAndBook(bool hasRequiredData) {
+    if (!hasRequiredData) {
+      _showValidationError('Please add vehicle and address details');
+      return;
+    }
+
     if (_selectedService == null) {
       _showValidationError('Please select a charging service');
       return;
@@ -436,7 +463,91 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
       _showValidationError('Please select a time slot');
       return;
     }
-    OnlinePayment.showRazorPaySheet(_selectedService!.price.toDouble(), "Total amount");
+    // OnlinePayment.showRazorPaySheet(
+    //     _selectedService!.price.toDouble(), "Total amount", );
+
+    //   OnlinePayment
+    Razorpay razorpay = Razorpay();
+    Map<String, Object> getTurboPaymentOptions() {
+      return {
+        "key": "rzp_test_KVEEmRUEiacNTK",
+        "amount": (_selectedService!.price.toDouble() * 100).toString(),
+        "name": "Fuell Delivery App",
+        "description": "Total amount",
+        "external": {
+          "wallets": ["paytm"]
+        }
+      };
+    }
+
+    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR,
+        (PaymentFailureResponse response) {
+      _showValidationError(
+          "Payment Failed: ${response.message ?? 'Error occurred during payment'}");
+    });
+
+    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
+        (PaymentSuccessResponse response) async {
+      try {
+        final orderData = {
+          'orderId': response.orderId,
+          'paymentId': response.paymentId,
+          'signature': response.signature,
+          'amount': _selectedService!.price,
+          'timeSlot': _selectedTimeSlot,
+          'service': widget.service.toJson(),
+          'selectedService': _selectedService!.toJson(), // Convert to JSON
+
+          'status': 'success',
+          'userId': FireSetup.auth.currentUser?.uid, // Add user ID
+        };
+        final docRef = await FireSetup.orders.add(orderData);
+        print('Created order with ID: ${docRef.id}');
+
+        await FireSetup.profile.get().then((value) async {
+          List<dynamic> existingAddresses = value.data()?['orders'] ?? [];
+          existingAddresses.add(docRef.id);
+
+          return await FireSetup.profile.update({"Orders": existingAddresses});
+        }).then(
+          (value) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Order Added Successfully!',
+                  style: GoogleFonts.montserrat(),
+                ),
+                backgroundColor: Colors.green,
+              ),
+            );
+          },
+        ).onError(
+          (error, stackTrace) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '${error.toString()}!',
+                  style: GoogleFonts.montserrat(),
+                ),
+                backgroundColor: Colors.red,
+              ),
+            );
+          },
+        );
+
+        Navigator.pop(context);
+      } catch (e) {
+        print('Error saving order: ${e.toString()}');
+        _showValidationError('Failed to save order: ${e.toString()}');
+      }
+    });
+
+    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET,
+        (ExternalWalletResponse response) {
+      print("External Wallet: ${response.walletName}");
+    });
+
+    razorpay.open(getTurboPaymentOptions());
   }
 
   // Validation Error Dialog

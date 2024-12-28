@@ -6,10 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 class ProfilePage extends StatelessWidget {
   // Sample user data (would typically come from a state management solution)
   final Map<String, dynamic> userData = {
-    'name': 'John Doe',
-    'email': 'johndoe@example.com',
-    'profileImage': 'https://example.com/profile.jpg',
-    'memberSince': 'January 2023'
+    'name': FireSetup.auth.currentUser?.displayName,
+    'email': FireSetup.auth.currentUser?.email,
+    'profileImage': '',
+    'memberSince': ''
   };
 
   // Profile menu items
@@ -28,8 +28,8 @@ class ProfilePage extends StatelessWidget {
     },
     {
       'icon': Icons.history,
-      'title': 'Charging History',
-      'subtitle': 'View past charging sessions',
+      'title': 'Order History',
+      'subtitle': 'View past Orders',
       'route': '/charging-history'
     },
     {
@@ -225,7 +225,7 @@ class ProfilePage extends StatelessWidget {
             ),
             onTap: () {
               // Navigation logic
-              Navigator.pushNamed(context, item['route']);
+              // Navigator.pushNamed(context, item['route']);
             },
           ),
         ),

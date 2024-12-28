@@ -8,6 +8,10 @@ import 'package:fuel_delivery_app_user/core/presentation/pages/home/screens/add_
 import 'package:fuel_delivery_app_user/core/presentation/pages/home/screens/select_vehicle.dart';
 import 'package:fuel_delivery_app_user/core/presentation/pages/home/screens/service_detaile_page.dart';
 import 'package:fuel_delivery_app_user/core/services/profile_date_service.dart';
+import 'package:fuel_delivery_app_user/core/presentation/models/address_model.dart';
+import 'package:fuel_delivery_app_user/core/presentation/models/vehicle_model.dart';
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:fuel_delivery_app_user/core/services/service_page_services.dart';
 import 'package:gap/gap.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -376,51 +380,74 @@ class TopAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ProfileBloc, ProfileState>(
-      listener: (context, state) {
-        if (state is ProfileInitial) {
-          context.read<ProfileBloc>().add(FetchProfileData());
+    return StreamBuilder<ProfileModel>(
+      stream: ProfileDateService().getProfileStream(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
         }
-      },
-      builder: (context, state) {
 
-        
+        final profile = snapshot.data!;
+        final selectedAddress = profile.address.isNotEmpty &&
+                snapshot.data!.profileData["selectedAddress"].isNotEmpty
+            ? profile.address[
+                int.parse(snapshot.data!.profileData["selectedAddress"])]
+            : profile.address.isNotEmpty &&
+                    snapshot.data!.profileData["selectedAddress"].isEmpty
+                ? profile.address.first
+                : null;
+        final selectedVehicle = profile.vehicles.isNotEmpty &&
+                snapshot.data!.profileData["selectedVehicle"].isNotEmpty
+            ? profile.vehicles[
+                int.parse(snapshot.data!.profileData["selectedVehicle"])]
+            : profile.vehicles.isNotEmpty &&
+                    snapshot.data!.profileData["selectedVehicle"].isEmpty
+                ? profile.vehicles.first
+                : null;
+
+
+        // final selectedVehicle =
+        //     profile.vehicles.isNotEmpty ? profile.vehicles.first : null;
+
         return Row(
           children: [
-            const Expanded(
-              child: AddressCard(
-                  title: "Location",
-                  icon: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Image(
-                      image: AssetImage("assets/images/map_location.png"),
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  subTitle: "manippara kerala, india 670705"),
-            ),
-            const Gap(12),
             Expanded(
-                child: GestureDetector(
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const VehicleSelectionPage(),
-                  )),
-              child: const AddressCard(
-                title: "Vehicle",
-                icon: SizedBox(
-                  width: 50,
-                  height: 50,
+              child: AddressCard(
+                title: selectedAddress?.fullName ?? "Location",
+                icon: const SizedBox(
+                  width: 40,
+                  height: 40,
                   child: Image(
-                    image: AssetImage("assets/images/11-2-car-picture.png"),
+                    image: AssetImage("assets/images/map_location.png"),
                     fit: BoxFit.contain,
                   ),
                 ),
-                subTitle: "car",
+                subTitle: selectedAddress?.city ?? "Add Address",
               ),
-            ))
+            ),
+            const Gap(12),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const VehicleSelectionPage(),
+                  ),
+                ),
+                child: AddressCard(
+                  title: selectedVehicle?.model ?? "Vehicle",
+                  icon: const SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Image(
+                      image: AssetImage("assets/images/11-2-car-picture.png"),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  subTitle: selectedVehicle?.model ?? "Add Vehicle",
+                ),
+              ),
+            ),
           ],
         );
       },

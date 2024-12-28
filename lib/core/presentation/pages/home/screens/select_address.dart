@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fuel_delivery_app_user/config/firebase_cofigarations.dart';
 import 'package:fuel_delivery_app_user/core/presentation/models/address_model.dart';
 import 'package:fuel_delivery_app_user/core/presentation/pages/home/screens/add_address.dart';
 import 'package:fuel_delivery_app_user/core/services/profile_date_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:fuel_delivery_app_user/config/firebase_cofigarations.dart';
 
 class AddressListPage extends StatefulWidget {
   const AddressListPage({super.key});
@@ -54,17 +54,17 @@ class _AddressListPageState extends State<AddressListPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
           ),
-
           Expanded(
-            child: StreamBuilder<List<AddressModel>>(
-              stream: _profileService.getAddressStream(),
+            child: StreamBuilder<ProfileModel>(
+              stream: _profileService.getProfileStream(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
@@ -78,7 +78,7 @@ class _AddressListPageState extends State<AddressListPage> {
                   );
                 }
 
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                if (!snapshot.hasData || snapshot.data!.address.isEmpty) {
                   return Center(
                     child: Text(
                       'No addresses found',
@@ -87,8 +87,18 @@ class _AddressListPageState extends State<AddressListPage> {
                   );
                 }
 
-                final addresses = snapshot.data!;
-                
+                final addresses = snapshot.data!.address;
+
+                if (selectedAddressId == null && addresses.isNotEmpty) {
+                  if (snapshot
+                      .data!.profileData["selectedAddress"].isNotEmpty) {
+                    selectedAddressId =
+                        snapshot.data!.profileData["selectedAddress"];
+                  } else {
+                    selectedAddressId = '0';
+                  }
+                }
+
                 return ListView.builder(
                   itemCount: addresses.length,
                   padding: const EdgeInsets.all(16),
@@ -172,7 +182,8 @@ class _AddressListPageState extends State<AddressListPage> {
                                   ),
                                 ),
                                 TextButton.icon(
-                                  icon: const Icon(Icons.delete_outline, size: 18),
+                                  icon: const Icon(Icons.delete_outline,
+                                      size: 18),
                                   label: const Text('Delete'),
                                   onPressed: () {},
                                   style: TextButton.styleFrom(
@@ -191,19 +202,36 @@ class _AddressListPageState extends State<AddressListPage> {
               },
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: selectedAddressId != null
-                  ? () {
-                      Navigator.pop(context, selectedAddressId);
+                  ? () async {
+                      try {
+                        await FireSetup.users
+                            .doc(FireSetup.auth.currentUser!.uid)
+                            .update({"selectedAddress": selectedAddressId});
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Address updated successfully'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to update address: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),

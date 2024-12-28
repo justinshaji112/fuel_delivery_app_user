@@ -51,14 +51,14 @@ class _VehicleSelectionPageState extends State<VehicleSelectionPage> {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
             ),
           ),
-
           Expanded(
             child: StreamBuilder<List<VehicleModel>>(
               stream: _profileService.getVehiclesStream(),
@@ -165,7 +165,6 @@ class _VehicleSelectionPageState extends State<VehicleSelectionPage> {
               },
             ),
           ),
-
           if (selectedVehicleId != null)
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -215,7 +214,28 @@ class _VehicleSelectionPageState extends State<VehicleSelectionPage> {
     );
   }
 
-  void _continueWithSelectedVehicle() {
+  void _continueWithSelectedVehicle() async {
+    if (selectedVehicleId != null) {
+      try {
+        await FireSetup.users
+            .doc(FireSetup.auth.currentUser!.uid)
+            .update({"selectedVehicle": selectedVehicleId});
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Address updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update address: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
     Navigator.pop(context, selectedVehicleId);
   }
 }
