@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fuel_delivery_app_user/firebase_cofigarations.dart';
 
-import 'package:fuel_delivery_app_user/services/profile_date_service.dart';
+import 'package:fuel_delivery_app_user/repository/profile_date_service.dart';
 import 'package:fuel_delivery_app_user/models/address_model.dart';
 import 'package:fuel_delivery_app_user/models/services_model.dart';
 import 'package:fuel_delivery_app_user/models/vehicle_model.dart';

@@ -17,9 +17,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 List<Widget> screens = [
-  const NewHomePage(),
+  const HomeScreenContent(),
   // LocationScreen(),
-   AddressListPage(),
+  AddressListPage(),
   // const ProfileScreen(),
   ProfilePage()
 ];
@@ -28,7 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int index = 0;
   @override
   Widget build(BuildContext context) {
-    final authBloc = context.read<AuthBloc>();
     return Scaffold(
       body: screens[index],
       bottomNavigationBar: GNav(

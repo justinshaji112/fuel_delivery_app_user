@@ -6,7 +6,14 @@ class RouteNames {
   static RoutModel singUp =RoutModel(name: "singUp", path:  "/auth/singUp");
   static RoutModel checkLogedIn =RoutModel(name: "CheckSingin", path:  "/auth/CheckSingin");
   static RoutModel onBoarding =RoutModel(name: "OnBoarding", path:  "/Onboarding");
-  static RoutModel validateEmail =RoutModel(name: "validate_email", path:  "/validate_email");
+
+ 
   static RoutModel OrderHistory =RoutModel(name: "order-history", path:  "/order-history");
+  //verify  email
+  static RoutModel verifyEmail =RoutModel(name: "verify-email", path:  "/verify-email");
+
+
+  //forgot password
+  static RoutModel forgotPassword =RoutModel(name: "forgot-password", path:  "/forgot-password");
   
 }

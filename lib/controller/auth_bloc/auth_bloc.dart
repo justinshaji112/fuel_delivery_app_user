@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fuel_delivery_app_user/repositories/auth_datasorce.dart';
+import 'package:fuel_delivery_app_user/repository/auth_datasorce.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';

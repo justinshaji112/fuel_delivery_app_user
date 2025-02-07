@@ -6,20 +6,20 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:fuel_delivery_app_user/firebase_cofigarations.dart';
 
-import 'package:fuel_delivery_app_user/services/profile_date_service.dart';
-import 'package:fuel_delivery_app_user/services/service_page_services.dart';
+import 'package:fuel_delivery_app_user/repository/profile_date_service.dart';
+import 'package:fuel_delivery_app_user/repository/service_page_services.dart';
 import 'package:fuel_delivery_app_user/models/services_model.dart';
 import 'package:fuel_delivery_app_user/view/pages/home/screens/select_vehicle.dart';
 import 'package:fuel_delivery_app_user/view/pages/home/screens/service_detaile_page.dart';
 
-class NewHomePage extends StatefulWidget {
-  const NewHomePage({super.key});
+class HomeScreenContent extends StatefulWidget {
+  const HomeScreenContent({super.key});
 
   @override
-  State<NewHomePage> createState() => _NewHomePageState();
+  State<HomeScreenContent> createState() => _NewHomePageState();
 }
 
-class _NewHomePageState extends State<NewHomePage> {
+class _NewHomePageState extends State<HomeScreenContent> {
   @override
   void initState() {
     // TODO: implement initState

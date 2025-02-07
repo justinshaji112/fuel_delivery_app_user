@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fuel_delivery_app_user/firebase_cofigarations.dart';
-import 'package:fuel_delivery_app_user/services/profile_date_service.dart';
+import 'package:fuel_delivery_app_user/repository/profile_date_service.dart';
 import 'package:fuel_delivery_app_user/view/pages/home/screens/add_address.dart';
 import 'package:google_fonts/google_fonts.dart';
 

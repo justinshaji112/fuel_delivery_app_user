@@ -1,38 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:fuel_delivery_app_user/utils/constants/images.dart';
+import 'package:fuel_delivery_app_user/utils/constants/text_string.dart';
 
 class GoogleButton extends StatelessWidget {
-  const GoogleButton({
-    super.key,
-    required this.icon,
-    required this.onPressed,
-  });
-
-  final String icon;
   final VoidCallback onPressed;
+  const GoogleButton({
+    required this.onPressed,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPressed,
-      child: Container(
-        width: 300,
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: Colors.black12,
-            width: 1.5,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Image.asset(
-            icon,
-            width: 24,
+    return OutlinedButton(
+      onPressed: onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            ImageUrls.googleIcon,
             height: 24,
+            width: 24,
           ),
-        ),
+          const SizedBox(
+            width: 10,
+          ),
+          const Text(
+            AppStrings.loginWithGoogle,
+          )
+        ],
       ),
     );
   }

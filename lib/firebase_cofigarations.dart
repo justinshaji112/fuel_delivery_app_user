@@ -12,4 +12,7 @@ class FireSetup {
       FirebaseFirestore.instance.collection('services');
   static DocumentReference<Map<String, dynamic>> profile =
       FirebaseFirestore.instance.collection('users').doc(auth.currentUser!.uid);
+
+
+      
 }

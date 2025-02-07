@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fuel_delivery_app_user/firebase_cofigarations.dart';
-import 'package:fuel_delivery_app_user/view/pages/auth/login_page.dart';
+import 'package:fuel_delivery_app_user/view/pages/auth/login_screen.dart';
+import 'package:fuel_delivery_app_user/view/pages/auth/manage_login.dart';
+import 'package:fuel_delivery_app_user/view/routes/route_names.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -115,7 +117,9 @@ class ProfilePage extends StatelessWidget {
           // Profile Image
           CircleAvatar(
             radius: 50,
-            backgroundImage: NetworkImage(userData['profileImage']),
+            backgroundImage: userData['profileImage'] != null
+                ? NetworkImage(userData['profileImage'])
+                : null,
             child: userData['profileImage'] == null
                 ? const Icon(Icons.person, size: 50)
                 : null,
@@ -129,14 +133,14 @@ class ProfilePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  userData['name'],
+                  userData['name'] ?? " ",
                   style: GoogleFonts.montserrat(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
-                  userData['email'],
+                  userData['email'] ?? "",
                   style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: Colors.black54,
@@ -144,7 +148,7 @@ class ProfilePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  'Member Since: ${userData['memberSince']}',
+                  'Member Since: ${userData['memberSince'] ?? ""}',
                   style: GoogleFonts.montserrat(
                     fontSize: 12,
                     color: Colors.black45,
@@ -272,9 +276,11 @@ class ProfilePage extends StatelessWidget {
               color: Colors.red,
             ),
           ),
-          onTap: () {
+          onTap: () async {
+            await FireSetup.auth.signOut();
+            context.go(RouteNames.signIn.path);
             // Show logout confirmation dialog
-            _showLogoutConfirmationDialog(context);
+            // _showLogoutConfirmationDialog(context);
           },
         ),
       ),
@@ -318,7 +324,7 @@ class ProfilePage extends StatelessWidget {
                 await FireSetup.auth.signOut();
                 Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
-                      builder: (context) => const LoginPage(),
+                      builder: (context) => const LoginManager(),
                     ),
                     (route) => false);
               },
