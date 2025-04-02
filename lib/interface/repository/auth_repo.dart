@@ -1,5 +1,5 @@
 abstract interface class AuthRepo {
-    Future<void> signUp(String email, String password,String phone, String name);
+  Future<void> signUp(String email, String password, String phone, String name);
   Future<bool> signIn(String email, String password);
 
   Future<bool> signOut();
@@ -10,5 +10,4 @@ abstract interface class AuthRepo {
   Future<bool> isEmailVerified();
   Future<bool> isPasswordResetEmailSent();
   Future<bool> signinWithGoogle();
-
 }

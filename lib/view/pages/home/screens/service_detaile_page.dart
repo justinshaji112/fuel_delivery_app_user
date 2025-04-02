@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fuel_delivery_app_user/controller/order_cubit/order_cubit.dart';
+import 'package:fuel_delivery_app_user/controller/profile_cubit/profile_cubit.dart';
 import 'package:fuel_delivery_app_user/firebase_cofigarations.dart';
+import 'package:fuel_delivery_app_user/models/order_model.dart';
+import 'package:fuel_delivery_app_user/models/profile_model.dart';
+import 'package:fuel_delivery_app_user/models/service_model.dart';
 
-import 'package:fuel_delivery_app_user/repository/profile_date_service.dart';
 import 'package:fuel_delivery_app_user/models/address_model.dart';
-import 'package:fuel_delivery_app_user/models/services_model.dart';
 import 'package:fuel_delivery_app_user/models/vehicle_model.dart';
+import 'package:fuel_delivery_app_user/view/pages/home/screens/select_address.dart';
+import 'package:fuel_delivery_app_user/view/pages/home/screens/select_vehicle.dart';
+import 'package:fuel_delivery_app_user/view/routes/route_names.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class ServiceBookingPage extends StatefulWidget {
-  final Service service;
+  final ServiceModel service;
   const ServiceBookingPage({super.key, required this.service});
 
   @override
@@ -19,8 +27,9 @@ class ServiceBookingPage extends StatefulWidget {
 
 class _ServiceBookingPageState extends State<ServiceBookingPage> {
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
+
   String? _selectedTimeSlot;
-  SubService? _selectedService;
+  SubServiceModel? _selectedService;
   VehicleModel? selectedVehicle;
   AddressModel? selectedAddress;
 
@@ -53,31 +62,19 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
           ),
         ),
       ),
-      body: StreamBuilder<ProfileModel>(
-        stream: ProfileDateService().getProfileStream(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+      body: BlocBuilder<ProfileCubit, ProfileState>(
+        builder: (context, state) {
+          if (state is ProfileSuccess) {
+            ProfileModel profileModel = state.profile.copyWith();
+            if (profileModel.selectedAddress != null) {
+              selectedAddress =
+                  profileModel.address[profileModel.selectedAddress!];
+            }
+            if (profileModel.selectedVehicle != null) {
+              selectedVehicle =
+                  profileModel.vehicles[profileModel.selectedVehicle! - 1];
+            }
           }
-
-          final profile = snapshot.data!;
-          selectedAddress = profile.address.isNotEmpty &&
-                  snapshot.data!.profileData["selectedAddress"].isNotEmpty
-              ? profile.address[
-                  int.parse(snapshot.data!.profileData["selectedAddress"])]
-              : profile.address.isNotEmpty &&
-                      snapshot.data!.profileData["selectedAddress"].isEmpty
-                  ? profile.address.first
-                  : null;
-          selectedVehicle = profile.vehicles.isNotEmpty &&
-                  snapshot.data!.profileData["selectedVehicle"].isNotEmpty
-              ? profile.vehicles[
-                  int.parse(snapshot.data!.profileData["selectedVehicle"])]
-              : profile.vehicles.isNotEmpty &&
-                      snapshot.data!.profileData["selectedVehicle"].isEmpty
-                  ? profile.vehicles.first
-                  : null;
-
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -167,60 +164,80 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
 
   // Vehicle Details Widget
   Widget _buildVehicleDetails(VehicleModel vehicle) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DetailRow(label: 'Make', value: vehicle.make),
-          DetailRow(label: 'Model', value: vehicle.model),
-          DetailRow(label: 'Year', value: vehicle.year),
-          if (vehicle.isElectric) ...[
-            DetailRow(
-                label: 'Battery Capacity',
-                value: vehicle.batteryCapacity ?? ''),
-            DetailRow(
-                label: 'Charger Type', value: "${vehicle.chargerType}" ?? ''),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VehicleSelectionPage(),
+            ));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
           ],
-        ],
+        ),
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DetailRow(label: 'Make', value: vehicle.make),
+            DetailRow(label: 'Model', value: vehicle.model),
+            DetailRow(label: 'Year', value: vehicle.year),
+            if (vehicle.isElectric) ...[
+              DetailRow(
+                  label: 'Battery Capacity',
+                  value: vehicle.batteryCapacity ?? ''),
+              DetailRow(
+                  label: 'Charger Type', value: "${vehicle.chargerType}" ?? ''),
+            ],
+          ],
+        ),
       ),
     );
   }
 
   // Address Details Widget
   Widget _buildAddressDetails(AddressModel address) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DetailRow(label: 'Street', value: address.streetAddress),
-          DetailRow(label: 'City', value: address.city),
-          DetailRow(label: 'State', value: address.state),
-          DetailRow(label: 'Postal Code', value: address.postalCode),
-        ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SelectAddressScreen(
+                enabled: true,
+              ),
+            ));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DetailRow(label: 'Street', value: address.streetAddress),
+            DetailRow(label: 'City', value: address.city),
+            DetailRow(label: 'State', value: address.state),
+            DetailRow(label: 'Postal Code', value: address.postalCode),
+          ],
+        ),
       ),
     );
   }
@@ -228,7 +245,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
   // Detail Row Helper
 
   // Service Options Widget
-  Widget _buildServiceOptions(Service service) {
+  Widget _buildServiceOptions(ServiceModel service) {
     return Column(
       children: service.subServices.map((subService) {
         return GestureDetector(
@@ -469,74 +486,43 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
 
     razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
         (PaymentSuccessResponse response) async {
-      try {
-        final orderData = {
-          "address":selectedAddress,
-          'orderDate': _selectedDate.toString(),
-          'timeSamp': DateTime.now().toString(),
-          'orderId': response.orderId,
-          'paymentId': response.paymentId,
-          'signature': response.signature,
-          'amount': _selectedService!.price,
-          'timeSlot': _selectedTimeSlot,
-          'service': widget.service.toJson(),
-          'selectedService': _selectedService!.toJson(),
-          'selectedVehicle':selectedVehicle!.toJson() ,
-          "orderStatus":"In Progress",
-          'status': 'success',
-          'userId': FireSetup.auth.currentUser?.uid,
-        };
-
-        // Add order to Firestore
-        final docRef = await FireSetup.orders.add(orderData);
-        print('Created order with ID: ${docRef.id}');
-
-        // Update user's profile with the new order ID
-        await FireSetup.profile.get().then((value) async {
-          // Retrieve existing orders (ensure correct field name)
-          List<dynamic> existingOrders = value.data()?['Orders'] ?? [];
-          print('Existing Orders: $existingOrders');
-
-          // Add new order ID
-          existingOrders.add(docRef.id);
-
-          // Update user's profile
-          await FireSetup.profile.update({"Orders": existingOrders});
-        }).then((_) {
-          // Success snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Order Added Successfully!',
-                style: GoogleFonts.montserrat(),
-              ),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }).onError((error, stackTrace) {
-          // Error snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${error.toString()}!',
-                style: GoogleFonts.montserrat(),
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-        });
-
-        Navigator.pop(context);
-      } catch (e) {
-        print('Error saving order: ${e.toString()}');
-        _showValidationError('Failed to save order: ${e.toString()}');
-      }
+      OrderCubit orderCubit = context.read<OrderCubit>();
+      orderCubit.placeOrder(OrderModel(
+        orderId: null,
+        status: "Pending",
+        paymentDone: true,
+        payOnDelivery: false,
+        address: selectedAddress!,
+        vehicle: selectedVehicle!,
+        createdAt: DateTime.now().toString(),
+        updatedAt: DateTime.now().toString(),
+        serviceId: widget.service.id!,
+        service: _selectedService!,
+        deliveryDate: _selectedDate.toString(),
+        deliveryTime: _selectedTimeSlot.toString(),
+        totalAmount: _selectedService!.price,
+        discountAmount: 12.0,
+        paymentMethod: "Upi",
+        paymentId: response.paymentId,
+      ));
     });
 
-    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET,
-        (ExternalWalletResponse response) {
-      print("External Wallet: ${response.walletName}");
-    });
+    // final orderData = {
+    //   "address": selectedAddress,
+    //   'orderDate': _selectedDate.toString(),
+    //   'timeSamp': DateTime.now().toString(),
+    //   'orderId': response.orderId,
+    //   'paymentId': response.paymentId,
+    //   'signature': response.signature,
+    //   'amount': _selectedService!.price,
+    //   'timeSlot': _selectedTimeSlot,
+    //   'service': widget.service.toJson(),
+    //   'selectedService': _selectedService!.toJson(),
+    //   'selectedVehicle': selectedVehicle!.toJson(),
+    //   "orderStatus": "In Progress",
+    //   'status': 'success',
+    //   'userId': FireSetup.auth.currentUser?.uid,
+    // };
 
     razorpay.open(getTurboPaymentOptions());
   }

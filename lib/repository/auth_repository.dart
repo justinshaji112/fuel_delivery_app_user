@@ -16,7 +16,7 @@ class AuthRepoImpl implements AuthRepo {
           .createUserWithEmailAndPassword(email: email, password: password);
       await FireSetup.users.doc(FireSetup.auth.currentUser!.uid).set({
         'email': email,
-        'phoneNumber': phone,
+        'phone': phone,
         'name': name,
       });
     } on FirebaseAuthException catch (e) {

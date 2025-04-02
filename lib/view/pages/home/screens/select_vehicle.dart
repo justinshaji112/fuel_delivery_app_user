@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fuel_delivery_app_user/repository/profile_date_service.dart';
+import 'package:fuel_delivery_app_user/repository/profile_repository.dart';
 import 'package:fuel_delivery_app_user/models/vehicle_model.dart';
 import 'package:fuel_delivery_app_user/view/pages/home/screens/add_vechile.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fuel_delivery_app_user/firebase_cofigarations.dart';
 
@@ -25,7 +26,7 @@ class _VehicleSelectionPageState extends State<VehicleSelectionPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Select Vehicle',

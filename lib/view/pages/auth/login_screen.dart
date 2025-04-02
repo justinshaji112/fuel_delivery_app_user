@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fuel_delivery_app_user/controller/cubit/auth_cubit.dart';
+import 'package:fuel_delivery_app_user/controller/auth_cubit/auth_cubit.dart';
 import 'package:fuel_delivery_app_user/utils/constants/size.dart';
 import 'package:fuel_delivery_app_user/utils/constants/text_string.dart';
 import 'package:fuel_delivery_app_user/utils/validators/text_validators.dart';
@@ -73,14 +73,19 @@ class _LoginPageState extends State<LoginPage> {
               context.go(RouteNames.verifyEmail.path);
             }
             if (state is AuthSucess) {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  (Route<dynamic> route) => false);
+              if (mounted) {
+                context.go(RouteNames.home.path);
+              }
             }
             if (state is AuthFaild) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: Text("the error is ${state.message}"),
+                  );
+                },
+              );
             }
           },
           builder: (context, state) {

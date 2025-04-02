@@ -31,7 +31,7 @@ class AppStrings {
   //Veryfy Email strings
   static const String verifyEmailTitle = "Verify Email";
 
-  static const String verfyEmailDiscription =
+  static const String verfyEmaildescription =
       "A verification email has been sent to your email address. Please check your inbox (and spam folder) to verify your email address. If you didn’t receive the email, you can request a new one.";
 
   static const String resendEmail = "Resend Email";

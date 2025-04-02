@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fuel_delivery_app_user/firebase_cofigarations.dart';
 import 'package:fuel_delivery_app_user/view/pages/auth/login_screen.dart';
 import 'package:fuel_delivery_app_user/view/pages/auth/manage_login.dart';
+import 'package:fuel_delivery_app_user/view/pages/order/order_history.dart';
+import 'package:fuel_delivery_app_user/view/pages/home/screens/select_address.dart';
+import 'package:fuel_delivery_app_user/view/pages/home/screens/select_vehicle.dart';
 import 'package:fuel_delivery_app_user/view/routes/route_names.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,19 +24,19 @@ class ProfilePage extends StatelessWidget {
       'icon': Icons.car_repair,
       'title': 'My Vehicles',
       'subtitle': 'Manage your registered vehicles',
-      'route': '/vehicles'
+      'route': VehicleSelectionPage,
     },
     {
       'icon': Icons.location_on,
       'title': 'Addresses',
       'subtitle': 'Manage delivery and charging locations',
-      'route': '/addresses'
+      'route': SelectAddressScreen,
     },
     {
       'icon': Icons.history,
       'title': 'Order History',
       'subtitle': 'View past Orders',
-      'route': '/order-history'
+      'route': OrderHistoryPage(),
     },
     {
       'icon': Icons.payment,
@@ -229,9 +232,11 @@ class ProfilePage extends StatelessWidget {
               color: Colors.black54,
             ),
             onTap: () {
-              // Navigation logic
-              // Navigator.pushNamed(context, item['route']);
-              context.go("/order-history");
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => item["route"],
+                  ));
             },
           ),
         ),

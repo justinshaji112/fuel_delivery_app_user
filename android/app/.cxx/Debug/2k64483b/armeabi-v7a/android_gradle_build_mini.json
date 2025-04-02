@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/home/justin/Development/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/home/justin/Android/Sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/home/justin/Programs/Flutter/Fuel_delivery/Project_test/fuel_delivery_app_user/android/app/.cxx/Debug/2k64483b/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/home/justin/Android/Sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/home/justin/Programs/Flutter/Fuel_delivery/Project_test/fuel_delivery_app_user/android/app/.cxx/Debug/2k64483b/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

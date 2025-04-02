@@ -5,6 +5,8 @@ import 'package:fuel_delivery_app_user/view/pages/auth/signup_screen.dart';
 import 'package:fuel_delivery_app_user/view/pages/auth/verify_email_screen.dart';
 import 'package:fuel_delivery_app_user/view/pages/home/screens/home.dart';
 import 'package:fuel_delivery_app_user/view/pages/home/screens/screen_home.dart';
+import 'package:fuel_delivery_app_user/view/pages/home/screens/select_address.dart';
+import 'package:fuel_delivery_app_user/view/pages/home/screens/select_vehicle.dart';
 import 'package:fuel_delivery_app_user/view/routes/route_names.dart';
 import 'package:go_router/go_router.dart';
 
@@ -46,6 +48,9 @@ class AppRouter {
       GoRoute(
           path: RouteNames.forgotPassword.path,
           builder: (context, state) => const ForgotPasswordScreen()),
+
+
+        
     ],
   );
 }

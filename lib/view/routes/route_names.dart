@@ -15,5 +15,9 @@ class RouteNames {
 
   //forgot password
   static RoutModel forgotPassword =RoutModel(name: "forgot-password", path:  "/forgot-password");
+  static RoutModel selectAddress = RoutModel(name: "select-address", path: "/address");
+  static RoutModel selectVehicle = RoutModel(name: "select-vehicle", path: "/vehicles");
+    static RoutModel addAddress = RoutModel(name: "add-address", path: "/address/add-address");
+  static RoutModel addVehicle = RoutModel(name: "add-vehicle", path: "/vehicles/add-vehicle");
   
 }

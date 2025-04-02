@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fuel_delivery_app_user/repository/profile_date_service.dart';
+import 'package:fuel_delivery_app_user/repository/profile_repository.dart';
 import 'package:fuel_delivery_app_user/models/address_model.dart';
 import 'package:fuel_delivery_app_user/models/vehicle_model.dart';
 

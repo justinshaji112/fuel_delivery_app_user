@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fuel_delivery_app_user/controller/cubit/auth_cubit.dart';
+import 'package:fuel_delivery_app_user/controller/auth_cubit/auth_cubit.dart';
 import 'package:fuel_delivery_app_user/utils/constants/colors.dart';
 import 'package:fuel_delivery_app_user/utils/constants/text_string.dart';
 import 'package:fuel_delivery_app_user/view/pages/auth/login_screen.dart';
@@ -63,7 +63,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  AppStrings.verfyEmailDiscription,
+                  AppStrings.verfyEmaildescription,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),

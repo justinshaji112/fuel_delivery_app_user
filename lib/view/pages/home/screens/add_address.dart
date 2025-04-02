@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fuel_delivery_app_user/controller/profile_cubit/profile_cubit.dart';
+
 import 'package:fuel_delivery_app_user/firebase_cofigarations.dart';
+import 'package:fuel_delivery_app_user/models/address_model.dart';
+import 'package:fuel_delivery_app_user/utils/helpers/snackbar.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AddAddressPage extends StatefulWidget {
-  Address? address;
+  AddressModel? address;
   AddAddressPage({super.key, this.address});
 
   @override
@@ -225,41 +230,64 @@ class _AddAddressPageState extends State<AddAddressPage> {
 
                 // Submit Button
                 Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {});
-                      isLoading = true;
-                      _submitAddressDetails().then(
-                        (value) {
-                          isLoading = false;
-                          setState(() {});
+                  child: BlocConsumer<ProfileCubit, ProfileState>(
+                    listener: (context, state) {
+                      if (state is ProfileSuccess) {
+                        AppSnackBars.showSuccessSnackBar(
+                            context, "Address is added");
+                        context.pop();
+                      }
+                      if (state is ProfileError) {
+                        AppSnackBars.showErrorSnackBar(context, state.error);
+                      }
+                    },
+                    builder: (context, state) {
+                      return ElevatedButton(
+                        onPressed: () {
+                          ProfileCubit profileCubit =
+                              context.read<ProfileCubit>();
+                          if (profileCubit.profileModel != null) {
+                            profileCubit.profileModel!.address?.add(
+                                AddressModel(
+                                    country: _selectedCountry,
+                                    phoneNumber: _phoneController.text,
+                                    city: _cityController.text,
+                                    streetAddress: _streetController.text,
+                                    addressType: _selectedAddressType,
+                                    postalCode: _postalCodeController.text,
+                                    apartmentUnit: _apartmentController.text,
+                                    fullName: _fullNameController.text,
+                                    state: _stateController.text));
+                            profileCubit.upDate(
+                                profile: profileCubit.profileModel!);
+                          }
                         },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: state is ProfileLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                'Save Address',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            'Save Address',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
                   ),
                 ),
               ],
@@ -360,56 +388,58 @@ class _AddAddressPageState extends State<AddAddressPage> {
   }
 
   // Submit Address Details Method
-  Future<void> _submitAddressDetails() async {
-    if (_formKey.currentState!.validate()) {
-      // Collect all address details
-      final addressDetails = {
-        'addressType': _selectedAddressType,
-        'fullName': _fullNameController.text,
-        'phoneNumber': _phoneController.text,
-        'streetAddress': _streetController.text,
-        'apartmentUnit': _apartmentController.text,
-        'country': _selectedCountry,
-        'city': _cityController.text,
-        'state': _stateController.text,
-        'postalCode': _postalCodeController.text,
-      };
+  // Future<void> _submitAddressDetails() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     // Collect all address details
+  //     final addressDetails = {
+  //       'addressType': _selectedAddressType,
+  //       'fullName': _fullNameController.text,
+  //       'phoneNumber': _phoneController.text,
+  //       'streetAddress': _streetController.text,
+  //       'apartmentUnit': _apartmentController.text,
+  //       'country': _selectedCountry,
+  //       'city': _cityController.text,
+  //       'state': _stateController.text,
+  //       'postalCode': _postalCodeController.text,
+  //     };
 
-      // TODO: Implement your logic to save address details
-      // For now, we'll just print the details
-      print('Address Details: $addressDetails');
+  //     // TODO: Implement your logic to save address details
+  //     // For now, we'll just print the details
+  //     print('Address Details: $addressDetails');
 
-      await FireSetup.profile.get().then((value) async {
-        List<dynamic> existingAddresses = value.data()?['address'] ?? [];
-        existingAddresses.add(addressDetails);
+  //     await FireSetup.profile.get().then((value) async {
+  //       List<dynamic> existingAddresses = value.data()?['address'] ?? [];
+  //       existingAddresses.add(addressDetails);
 
-        return await FireSetup.profile.update({"address": existingAddresses});
-      }).then(
-        (value) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Address Added Successfully!',
-                style: GoogleFonts.montserrat(),
-              ),
-              backgroundColor: Colors.green,
-            ),
-          );
-        },
-      ).onError(
-        (error, stackTrace) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${error.toString()}!',
-                style: GoogleFonts.montserrat(),
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-        },
-      );
-      // Optional: Show a success dialog or navigate to another page
-    }
-  }
+  //       return await FireSetup.profile.update({"address": existingAddresses});
+  //     }
+
+  //     ).then(
+  //       (value) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text(
+  //               'Address Added Successfully!',
+  //               style: GoogleFonts.montserrat(),
+  //             ),
+  //             backgroundColor: Colors.green,
+  //           ),
+  //         );
+  //       },
+  //     ).onError(
+  //       (error, stackTrace) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text(
+  //               '${error.toString()}!',
+  //               style: GoogleFonts.montserrat(),
+  //             ),
+  //             backgroundColor: Colors.red,
+  //           ),
+  //         );
+  //       },
+  //     );
+  //     // Optional: Show a success dialog or navigate to another page
+  //   }
+  // }
 }

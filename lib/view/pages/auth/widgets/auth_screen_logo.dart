@@ -16,7 +16,7 @@ class AuthScreenLogo extends StatelessWidget {
           color: Colors.black,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const HugeIcon(
+        child: HugeIcon(
             icon: HugeIcons.strokeRoundedUserLock01,
             color: Colors.white,
             size: 60),

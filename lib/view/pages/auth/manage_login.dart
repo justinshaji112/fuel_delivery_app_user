@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fuel_delivery_app_user/controller/cubit/auth_cubit.dart';
+import 'package:fuel_delivery_app_user/controller/auth_cubit/auth_cubit.dart';
 import 'package:fuel_delivery_app_user/view/pages/auth/login_screen.dart';
 import 'package:fuel_delivery_app_user/view/pages/auth/verify_email_screen.dart';
 import 'package:fuel_delivery_app_user/view/pages/home/screens/home.dart';

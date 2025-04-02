@@ -1,3 +1,6 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 class AddressModel {
   final String country;
   final String phoneNumber;
@@ -23,15 +26,34 @@ class AddressModel {
 
   factory AddressModel.fromMap(Map<String, dynamic> map) {
     return AddressModel(
-      country: map['country'] ?? '',
-      phoneNumber: map['phoneNumber'] ?? '',
-      city: map['city'] ?? '',
-      streetAddress: map['streetAddress'] ?? '',
-      addressType: map['addressType'] ?? '',
-      postalCode: map['postalCode'] ?? '',
-      apartmentUnit: map['apartmentUnit'] ?? '',
-      fullName: map['fullName'] ?? '',
-      state: map['state'] ?? '',
+      country: map['country'] as String,
+      phoneNumber: map['phoneNumber'] as String,
+      city: map['city'] as String,
+      streetAddress: map['streetAddress'] as String,
+      addressType: map['addressType'] as String,
+      postalCode: map['postalCode'] as String,
+      apartmentUnit: map['apartmentUnit'] as String,
+      fullName: map['fullName'] as String,
+      state: map['state'] as String,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'country': country,
+      'phoneNumber': phoneNumber,
+      'city': city,
+      'streetAddress': streetAddress,
+      'addressType': addressType,
+      'postalCode': postalCode,
+      'apartmentUnit': apartmentUnit,
+      'fullName': fullName,
+      'state': state,
+    };
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory AddressModel.fromJson(String source) => AddressModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }
+
