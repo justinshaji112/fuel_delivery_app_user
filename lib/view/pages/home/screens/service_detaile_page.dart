@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fuel_delivery_app_user/controller/order_cubit/order_cubit.dart';
 import 'package:fuel_delivery_app_user/controller/profile_cubit/profile_cubit.dart';
+import 'package:fuel_delivery_app_user/controller/time_slot_cubit/time_slot_cubit.dart';
 import 'package:fuel_delivery_app_user/firebase_cofigarations.dart';
 import 'package:fuel_delivery_app_user/models/order_model.dart';
 import 'package:fuel_delivery_app_user/models/profile_model.dart';
 import 'package:fuel_delivery_app_user/models/service_model.dart';
 
 import 'package:fuel_delivery_app_user/models/address_model.dart';
+import 'package:fuel_delivery_app_user/models/slot_model.dart';
 import 'package:fuel_delivery_app_user/models/vehicle_model.dart';
 import 'package:fuel_delivery_app_user/view/pages/home/screens/select_address.dart';
 import 'package:fuel_delivery_app_user/view/pages/home/screens/select_vehicle.dart';
@@ -28,10 +32,28 @@ class ServiceBookingPage extends StatefulWidget {
 class _ServiceBookingPageState extends State<ServiceBookingPage> {
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
 
-  String? _selectedTimeSlot;
+  TextEditingController _selectedTimeSlot = TextEditingController();
+  TextEditingController dateListnigControlelr = TextEditingController();
+
   SubServiceModel? _selectedService;
   VehicleModel? selectedVehicle;
   AddressModel? selectedAddress;
+
+  _getSlotes() {
+    context
+        .read<TimeSlotCubit>()
+        .getTimeSlots(serviceId: widget.service.id, date: _selectedDate);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    context
+        .read<TimeSlotCubit>()
+        .getTimeSlots(serviceId: widget.service.id, date: DateTime.now());
+    dateListnigControlelr.addListener(_getSlotes);
+  }
 
   // Generate time slots
   List<String> _generateTimeSlots() {
@@ -66,13 +88,15 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
         builder: (context, state) {
           if (state is ProfileSuccess) {
             ProfileModel profileModel = state.profile.copyWith();
-            if (profileModel.selectedAddress != null) {
+            if (profileModel.selectedAddress != null &&
+                profileModel.address.isNotEmpty) {
               selectedAddress =
                   profileModel.address[profileModel.selectedAddress!];
             }
-            if (profileModel.selectedVehicle != null) {
+            if (profileModel.selectedVehicle != null &&
+                profileModel.vehicles.isNotEmpty) {
               selectedVehicle =
-                  profileModel.vehicles[profileModel.selectedVehicle! - 1];
+                  profileModel.vehicles[profileModel.selectedVehicle!];
             }
           }
           return SingleChildScrollView(
@@ -105,15 +129,54 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
 
                   // Date Selection
                   _buildSectionHeader('Select Date'),
-                  _buildDatePicker(),
+                  DatePickerWidget(
+                      selectedDate: _selectedDate,
+                      dateListnigControlelr: dateListnigControlelr),
 
                   const SizedBox(height: 20),
 
                   // Time Slot Selection
                   _buildSectionHeader('Select Time Slot'),
-                  _buildTimeSlotSelection(),
+                  // _buildTimeSlotSelection(),
+                  BlocBuilder<TimeSlotCubit, TimeSlotState>(
+                      builder: (context, state) {
+                    if (state is TimeSlotSuccess) {
+                      if (state.slots.isEmpty) {
+                        return Container(
+                          height: 100,
+                          child: Center(
+                            child: Text(
+                              "No time slotes available. ! \n Try changing the date.",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        );
+                      }
 
-                  const SizedBox(height: 30),
+                      return TimeSlotPickerWidget(
+                          selectedTimeSlot: _selectedTimeSlot,
+                          slots: state.slots);
+                    }
+
+                    if (state is TimeSlotLoading) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    return Container(
+                      height: 100,
+                      child: Center(
+                        child: Text(
+                          "No time slotes forund.",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    );
+                  }),
+
+                  SizedBox(height: 30),
 
                   // Book Now Button
                   Center(
@@ -333,119 +396,119 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
   }
 
   // Date Picker Widget
-  Widget _buildDatePicker() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ListTile(
-        title: Text(
-          DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate),
-          style: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        trailing: const Icon(Icons.calendar_today, color: Colors.black),
-        onTap: () async {
-          DateTime? picked = await showDatePicker(
-            context: context,
-            initialDate: _selectedDate,
-            firstDate: DateTime.now(),
-            lastDate: DateTime.now().add(const Duration(days: 30)),
-            builder: (context, child) {
-              return Theme(
-                data: ThemeData.light().copyWith(
-                  colorScheme: const ColorScheme.light(
-                    primary: Colors.black,
-                  ),
-                ),
-                child: child!,
-              );
-            },
-          );
-          if (picked != null && picked != _selectedDate) {
-            setState(() {
-              _selectedDate = picked;
-            });
-          }
-        },
-      ),
-    );
-  }
+  // Widget _buildDatePicker() {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(15),
+  //       boxShadow: const [
+  //         BoxShadow(
+  //           color: Colors.black12,
+  //           blurRadius: 10,
+  //           offset: Offset(0, 4),
+  //         ),
+  //       ],
+  //     ),
+  //     child: ListTile(
+  //       title: Text(
+  //         DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate),
+  //         style: GoogleFonts.montserrat(
+  //           fontWeight: FontWeight.w600,
+  //         ),
+  //       ),
+  //       trailing: const Icon(Icons.calendar_today, color: Colors.black),
+  //       onTap: () async {
+  //         DateTime? picked = await showDatePicker(
+  //           context: context,
+  //           initialDate: _selectedDate,
+  //           firstDate: DateTime.now(),
+  //           lastDate: DateTime.now().add(const Duration(days: 30)),
+  //           builder: (context, child) {
+  //             return Theme(
+  //               data: ThemeData.light().copyWith(
+  //                 colorScheme: const ColorScheme.light(
+  //                   primary: Colors.black,
+  //                 ),
+  //               ),
+  //               child: child!,
+  //             );
+  //           },
+  //         );
+  //         if (picked != null && picked != _selectedDate) {
+  //           setState(() {
+  //             _selectedDate = picked;
+  //           });
+  //         }
+  //       },
+  //     ),
+  //   );
+  // }
 
   // Time Slot Selection Widget
-  Widget _buildTimeSlotSelection() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(15),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemCount: _generateTimeSlots().length,
-        itemBuilder: (context, index) {
-          String timeSlot = _generateTimeSlots()[index];
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedTimeSlot = timeSlot;
-              });
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: _selectedTimeSlot == timeSlot
-                    ? Colors.black12
-                    : Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                    color: _selectedTimeSlot == timeSlot
-                        ? Colors.black
-                        : Colors.transparent,
-                    width: 2),
-              ),
-              child: Center(
-                child: Text(
-                  timeSlot,
-                  style: GoogleFonts.montserrat(
-                    color: _selectedTimeSlot == timeSlot
-                        ? Colors.black
-                        : Colors.black87,
-                    fontWeight: _selectedTimeSlot == timeSlot
-                        ? FontWeight.w600
-                        : FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+  // Widget _buildTimeSlotSelection() {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(15),
+  //       boxShadow: const [
+  //         BoxShadow(
+  //           color: Colors.black12,
+  //           blurRadius: 10,
+  //           offset: Offset(0, 4),
+  //         ),
+  //       ],
+  //     ),
+  //     padding: const EdgeInsets.all(15),
+  //     child: GridView.builder(
+  //       shrinkWrap: true,
+  //       physics: const NeverScrollableScrollPhysics(),
+  //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+  //         crossAxisCount: 3,
+  //         childAspectRatio: 2,
+  //         crossAxisSpacing: 10,
+  //         mainAxisSpacing: 10,
+  //       ),
+  //       itemCount: _generateTimeSlots().length,
+  //       itemBuilder: (context, index) {
+  //         String timeSlot = _generateTimeSlots()[index];
+  //         return GestureDetector(
+  //           onTap: () {
+  //             setState(() {
+  //               _selectedTimeSlot = timeSlot;
+  //             });
+  //           },
+  //           child: Container(
+  //             decoration: BoxDecoration(
+  //               color: _selectedTimeSlot == timeSlot
+  //                   ? Colors.black12
+  //                   : Colors.grey.shade100,
+  //               borderRadius: BorderRadius.circular(10),
+  //               border: Border.all(
+  //                   color: _selectedTimeSlot == timeSlot
+  //                       ? Colors.black
+  //                       : Colors.transparent,
+  //                   width: 2),
+  //             ),
+  //             child: Center(
+  //               child: Text(
+  //                 timeSlot,
+  //                 style: GoogleFonts.montserrat(
+  //                   color: _selectedTimeSlot == timeSlot
+  //                       ? Colors.black
+  //                       : Colors.black87,
+  //                   fontWeight: _selectedTimeSlot == timeSlot
+  //                       ? FontWeight.w600
+  //                       : FontWeight.w500,
+  //                 ),
+  //                 textAlign: TextAlign.center,
+  //               ),
+  //             ),
+  //           ),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 
   // Validation and Booking Method
   void _validateAndBook(bool hasRequiredData) {
@@ -499,30 +562,13 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
         serviceId: widget.service.id!,
         service: _selectedService!,
         deliveryDate: _selectedDate.toString(),
-        deliveryTime: _selectedTimeSlot.toString(),
+        deliveryTime: _selectedTimeSlot.text.toString(),
         totalAmount: _selectedService!.price,
         discountAmount: 12.0,
         paymentMethod: "Upi",
         paymentId: response.paymentId,
       ));
     });
-
-    // final orderData = {
-    //   "address": selectedAddress,
-    //   'orderDate': _selectedDate.toString(),
-    //   'timeSamp': DateTime.now().toString(),
-    //   'orderId': response.orderId,
-    //   'paymentId': response.paymentId,
-    //   'signature': response.signature,
-    //   'amount': _selectedService!.price,
-    //   'timeSlot': _selectedTimeSlot,
-    //   'service': widget.service.toJson(),
-    //   'selectedService': _selectedService!.toJson(),
-    //   'selectedVehicle': selectedVehicle!.toJson(),
-    //   "orderStatus": "In Progress",
-    //   'status': 'success',
-    //   'userId': FireSetup.auth.currentUser?.uid,
-    // };
 
     razorpay.open(getTurboPaymentOptions());
   }
@@ -592,6 +638,154 @@ class DetailRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class DatePickerWidget extends StatefulWidget {
+  TextEditingController dateListnigControlelr;
+  DateTime selectedDate;
+  DatePickerWidget(
+      {super.key,
+      required this.selectedDate,
+      required this.dateListnigControlelr});
+
+  @override
+  State<DatePickerWidget> createState() => _DatePickerWidgetState();
+}
+
+class _DatePickerWidgetState extends State<DatePickerWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListTile(
+        title: Text(
+          DateFormat('EEEE, MMMM d, yyyy').format(widget.selectedDate),
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        trailing: const Icon(Icons.calendar_today, color: Colors.black),
+        onTap: () async {
+          DateTime? picked = await showDatePicker(
+            context: context,
+            initialDate: widget.selectedDate,
+            firstDate: DateTime.now(),
+            lastDate: DateTime.now().add(const Duration(days: 30)),
+            builder: (context, child) {
+              return Theme(
+                data: ThemeData.light().copyWith(
+                  colorScheme: const ColorScheme.light(
+                    primary: Colors.black,
+                  ),
+                ),
+                child: child!,
+              );
+            },
+          );
+          if (picked != null && picked != widget.selectedDate) {
+            setState(() {
+              widget.dateListnigControlelr.text = picked.toString();
+              widget.selectedDate = picked;
+            });
+          }
+        },
+      ),
+    );
+  }
+}
+
+class TimeSlotPickerWidget extends StatefulWidget {
+  TextEditingController selectedTimeSlot;
+  List<TimeSlotModel> slots;
+  TimeSlotPickerWidget(
+      {super.key, required this.selectedTimeSlot, required this.slots});
+
+  @override
+  State<TimeSlotPickerWidget> createState() => _TimeSlotPickerWidgetState();
+}
+
+class _TimeSlotPickerWidgetState extends State<TimeSlotPickerWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(15),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: widget.slots.length,
+        itemBuilder: (context, index) {
+          String timeSlot = widget.slots[index].time;
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                if (widget.slots[index].totalSlots !=
+                    widget.slots[index].booked) {
+                  widget.selectedTimeSlot.text = timeSlot;
+                }
+              });
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: widget.selectedTimeSlot.text == timeSlot
+                    ? Colors.black12
+                    : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                    color: widget.selectedTimeSlot.text == timeSlot
+                        ? Colors.black
+                        : Colors.transparent,
+                    width: 2),
+              ),
+              child: Center(
+                child: Text(
+                  timeSlot,
+                  style: GoogleFonts.montserrat(
+                    color: widget.slots[index].booked ==
+                            widget.slots[index].totalSlots
+                        ? Colors.redAccent
+                        : widget.selectedTimeSlot.text == timeSlot
+                            ? Colors.black
+                            : Colors.black87,
+                    fontWeight: widget.selectedTimeSlot.text == timeSlot
+                        ? FontWeight.w600
+                        : FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

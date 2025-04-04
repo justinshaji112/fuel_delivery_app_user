@@ -49,11 +49,17 @@ class TopAppBar extends StatelessWidget {
         if (state is ProfileSuccess) {
           AddressModel? selectedAddress;
           VehicleModel? selectedVehicle;
-          if (state.profile.address.isNotEmpty) {
+          if (state.profile.address.isNotEmpty &&
+              state.profile.selectedAddress != -1) {
             selectedAddress = state.profile
                 .address[int.parse(state.profile.selectedAddress.toString())];
-            selectedVehicle = state.profile.vehicles[
-                int.parse(state.profile.selectedAddress.toString()) - 1];
+          }
+          if (state.profile.vehicles.isNotEmpty &&
+              state.profile.selectedVehicle! >= 0) {
+
+            int index=int.parse(state.profile.selectedVehicle.toString());
+            selectedVehicle = state.profile
+                .vehicles[index];
           }
 
           return Row(

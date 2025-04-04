@@ -5,12 +5,14 @@ import 'package:fuel_delivery_app_user/controller/carousel_cubit/carousel_cubit.
 import 'package:fuel_delivery_app_user/controller/order_cubit/order_cubit.dart';
 import 'package:fuel_delivery_app_user/controller/profile_cubit/profile_cubit.dart';
 import 'package:fuel_delivery_app_user/controller/service_cubit/service_cubit.dart';
+import 'package:fuel_delivery_app_user/controller/time_slot_cubit/time_slot_cubit.dart';
 import 'package:fuel_delivery_app_user/di.dart';
 import 'package:fuel_delivery_app_user/interface/repository/auth_repo.dart';
 import 'package:fuel_delivery_app_user/repository/carousel_repository.dart';
 import 'package:fuel_delivery_app_user/repository/order_repository.dart';
 import 'package:fuel_delivery_app_user/repository/profile_repo.dart';
 import 'package:fuel_delivery_app_user/repository/service_repo.dart';
+import 'package:fuel_delivery_app_user/repository/time_slot_repo.dart';
 
 import 'package:fuel_delivery_app_user/utils/constants/colors.dart';
 
@@ -49,6 +51,12 @@ class BlocProviderScope extends StatelessWidget {
              BlocProvider<OrderCubit>(
           create: (context) =>
               OrderCubit(orderRepository: OrderRepository()),
+        ),
+
+
+             BlocProvider<TimeSlotCubit>(
+          create: (context) =>
+              TimeSlotCubit(timeSlotRepo : TimeSlotRepo()),
         ),
       ],
       child: MaterialApp.router(

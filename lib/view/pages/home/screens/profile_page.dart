@@ -24,31 +24,21 @@ class ProfilePage extends StatelessWidget {
       'icon': Icons.car_repair,
       'title': 'My Vehicles',
       'subtitle': 'Manage your registered vehicles',
-      'route': VehicleSelectionPage,
+      'route': VehicleSelectionPage(),
     },
     {
       'icon': Icons.location_on,
       'title': 'Addresses',
       'subtitle': 'Manage delivery and charging locations',
-      'route': SelectAddressScreen,
+      'route': SelectAddressScreen(
+        enabled: true,
+      ),
     },
     {
       'icon': Icons.history,
       'title': 'Order History',
       'subtitle': 'View past Orders',
       'route': OrderHistoryPage(),
-    },
-    {
-      'icon': Icons.payment,
-      'title': 'Payment Methods',
-      'subtitle': 'Add or remove payment options',
-      'route': '/payment-methods'
-    },
-    {
-      'icon': Icons.settings,
-      'title': 'App Settings',
-      'subtitle': 'Customize your app experience',
-      'route': '/settings'
     },
     {
       'icon': Icons.support,
@@ -120,12 +110,9 @@ class ProfilePage extends StatelessWidget {
           // Profile Image
           CircleAvatar(
             radius: 50,
-            backgroundImage: userData['profileImage'] != null
-                ? NetworkImage(userData['profileImage'])
-                : null,
-            child: userData['profileImage'] == null
-                ? const Icon(Icons.person, size: 50)
-                : null,
+            child: Text(
+              FireSetup.auth.currentUser?.displayName?[0] ?? "",
+            ),
           ),
 
           const SizedBox(width: 20),
